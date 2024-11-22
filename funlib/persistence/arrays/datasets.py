@@ -4,7 +4,7 @@ from typing import Optional, Sequence, Union
 import numpy as np
 import zarr
 from numpy.typing import DTypeLike
-
+from .voxels import _read_voxel_size_offset
 from funlib.geometry import Coordinate
 
 from .array import Array
@@ -108,12 +108,20 @@ def open_ds(
         units=units,
     )
 
+    try:
+        order = data.attrs["order"]
+    except KeyError:
+        order = data.order
+    voxel_size, offset = _read_voxel_size_offset(data, order)
+
     return Array(
         data,
-        metadata.offset,
-        metadata.voxel_size,
-        metadata.axis_names,
-        metadata.units,
+        # metadata.offset,
+        offset,
+        # metadata.voxel_size,
+        voxel_size,
+        tuple(metadata.axis_names),
+        tuple(metadata.units),
         data.chunks if chunks == "strict" else chunks,
     )
 

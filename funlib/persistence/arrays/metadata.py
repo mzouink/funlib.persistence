@@ -135,24 +135,29 @@ class MetaData:
 
     @property
     def voxel_size(self) -> Coordinate:
-        return (
-            self._voxel_size
-            if self._voxel_size is not None
-            else Coordinate((1,) * self.physical_dims)
-        )
+        if self._voxel_size is not None:
+            return self._voxel_size
+        else:
+            raise ValueError("Voxel size is not defined")
+        # return (
+        #     self._voxel_size
+        #     if self._voxel_size is not None
+        #     else Coordinate((1,) * self.physical_dims)
+        # )
 
     @property
     def axis_names(self) -> list[str]:
+
         return (
             self._axis_names
             if self._axis_names is not None
             else [f"c{dim}^" for dim in range(self.channel_dims)]
-            + [f"d{dim}" for dim in range(self.physical_dims)]
+            + ["z", "y", "x"]
         )
 
     @property
     def units(self) -> list[str]:
-        return self._units if self._units is not None else [""] * self.physical_dims
+        return self._units if self._units is not None else ["nm"] * self.physical_dims
 
     @property
     def dims(self) -> int:
